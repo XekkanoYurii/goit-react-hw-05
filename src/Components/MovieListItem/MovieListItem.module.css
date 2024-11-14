@@ -1,0 +1,14 @@
+.img {
+  border: 1px solid #444444;
+  border-radius: 6px;
+}
+
+.link {
+  max-width: 500px;
+  color: #444444;
+  text-decoration: none;
+
+  &:hover {
+    color: orange;
+  }
+}

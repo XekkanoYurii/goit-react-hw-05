@@ -1,0 +1,41 @@
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 20px;
+  font-size: 18px;
+}
+
+.listItem {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  padding: 8px;
+  width: calc((100% - 70px) / 8);
+  background-color: whitesmoke;
+  border: 1px solid #444444;
+  border-radius: 10px;
+}
+
+.picture {
+  border: 1px solid #444444;
+  border-radius: 6px;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.description {
+  width: auto;
+  font-size: 14px;
+  text-align: center;
+}
+
+.altDescription {
+  font-size: 18px;
+}

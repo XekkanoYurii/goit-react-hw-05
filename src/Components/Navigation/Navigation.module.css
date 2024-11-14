@@ -1,0 +1,22 @@
+.nav {
+  display: flex;
+  gap: 16px;
+  height: 100%;
+  padding-left: 16px;
+  align-items: center;
+  font-size: 22px;
+}
+
+.link {
+  color: black;
+  text-decoration: none;
+
+  &:hover {
+    color: orange;
+  }
+}
+
+.active {
+  color: orange;
+  text-decoration: underline;
+}

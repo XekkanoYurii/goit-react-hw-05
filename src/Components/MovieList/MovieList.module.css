@@ -1,0 +1,23 @@
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  column-gap: 32px;
+  margin-bottom: 20px;
+  justify-content: start;
+  width: 100%;
+  font-size: 26px;
+  font-weight: 500;
+}
+
+.listItem {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  width: calc((100% - 32px) / 2);
+  border: 1px solid #444444;
+  border-radius: 10px;
+  background-color: whitesmoke;
+}

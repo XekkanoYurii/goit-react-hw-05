@@ -8,8 +8,8 @@ import {
 } from "react-router-dom";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { fetchMovieDetails } from "../../servises/api";
-import Loader from "../../components/Loader/Loader";
-import MovieDetailsMarkup from "../../components/MovieDetailsMarkup/MovieDetailsMarkup";
+import Loader from "../../Components/Loader/Loader";
+import MovieDetailsMarkup from "../../Components/MovieDetailsMarkup/MovieDetailsMarkup";
 import clsx from "clsx";
 
 const buildLinkClass = ({ isActive }) => {

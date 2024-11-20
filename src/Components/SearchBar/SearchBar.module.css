@@ -1,0 +1,24 @@
+.container {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  align-items: center;
+}
+
+.input {
+  max-width: 400px;
+  width: 100%;
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+
+.button {
+  border-radius: 4px;
+  padding: 4px 8px;
+  background-color: #ff8945;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #fea16a;
+  }
+}

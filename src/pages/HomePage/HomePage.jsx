@@ -1,35 +1,29 @@
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { getTrendingMovies } from "../../services/api/tmdb-api";
+import { fetchTrendingMovies } from "../../servises/api";
 import MovieList from "../../components/MovieList/MovieList";
-
-import css from "./HomePage.module.css";
+import s from "./HomePage.module.css";
 
 const HomePage = () => {
-  const [movies, setMovies] = useState(null);
+  const [movies, setMovies] = useState([]);
 
   useEffect(() => {
-    const getMovies = async () => {
+    const getData = async () => {
       try {
-        const { results } = await getTrendingMovies();
-        setMovies(results);
-      } catch (error) {
-        toast.error(error.response.data.status_message);
+        const data = await fetchTrendingMovies();
+        setMovies(data.results);
+      } catch (err) {
+        console.log(err);
       }
     };
-
-    getMovies();
+    getData();
   }, []);
 
   return (
-    <main>
-      {movies && (
-        <>
-          <h1 className={css.title}>Tranding today</h1>
-          <MovieList items={movies} />
-        </>
-      )}
-    </main>
+    <div className={s.container}>
+      <h2>Trending today</h2>
+
+      <MovieList movies={movies} />
+    </div>
   );
 };
 

@@ -1,99 +1,50 @@
 import { useEffect, useState } from "react";
+import { fetchSearchMovies } from "../../servises/api";
 import { useSearchParams } from "react-router-dom";
-import toast from "react-hot-toast";
-import { getMovieBySearch } from "../../services/api/tmdb-api";
+import SearchBar from "../../components/SearchBar/SearchBar";
 import MovieList from "../../components/MovieList/MovieList";
-import css from "./MoviesPage.module.css";
-import Loader from "../../components/Loader/Loader";
-import LoadMoreButton from "../../components/LoadMoreBtn/LoadMoreBtn";
 
 const MoviesPage = () => {
-  const [requestedFilms, setRequestedFilms] = useState(null);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(null);
+  const [movies, setMovies] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [isLoading, setIsLoading] = useState(false);
-  const keyWord = searchParams.get("query") ?? "";
+  const filterValue = searchParams.get("query") ?? "";
 
+  // ----------------------------
   useEffect(() => {
-    setIsLoading(true);
-
-    const getSearch = async () => {
-      if (!keyWord) {
-        setIsLoading(false);
+    const getData = async () => {
+      if (!filterValue) {
         return;
       }
-
       try {
-        const { results, total_pages } = await getMovieBySearch(keyWord, page);
-        page === 1
-          ? setRequestedFilms(results)
-          : setRequestedFilms((prevState) => [...prevState, ...results]);
-
-        setTotalPages(total_pages);
+        const data = await fetchSearchMovies(filterValue);
+        setMovies(data.results);
       } catch (error) {
-        toast.error(error.response.data.status_message);
-      } finally {
-        setIsLoading(false);
+        console.log(error);
       }
     };
-    getSearch();
-  }, [keyWord, page]);
+    getData();
+  }, [filterValue]);
 
-  const handleSubmit = (e) => {
+  // ----------------------------
+  const onSubmit = (e) => {
     e.preventDefault();
-    setPage(1);
-    setTotalPages(null);
+    const newValue = e.target.elements.search.value.trim();
 
-    const form = e.target;
-    const inputValue = form.elements.input.value;
-    if (inputValue === "") {
-      toast.error("The request field must not be empty");
-      return;
+    if (!newValue) {
+      return setSearchParams({});
     }
 
-    setSearchParams({ query: inputValue.toLowerCase().trim() });
-    form.reset();
+    setSearchParams({ query: newValue });
+    searchParams.set("query", newValue);
   };
 
-  const onLoadMore = () => {
-    setPage((prevPage) => prevPage + 1);
-  };
-
-  useEffect(() => {
-    if (page > 1) scrollDown();
-  }, [requestedFilms, page]);
-
-  const scrollDown = () => {
-    window.scrollBy({
-      top: window.innerHeight / 2,
-      behavior: "smooth",
-    });
-  };
-
+  // ----------------------------
   return (
-    <section className={css.pageSection}>
-      <form className={css.form} action="submit" onSubmit={handleSubmit}>
-        <input
-          className={css.input}
-          type="text"
-          name="input"
-          placeholder="Enter your query"
-        />
-        <button className={css.button}>Submit</button>
-      </form>
+    <>
+      <SearchBar onSubmit={onSubmit} filterValue={filterValue} />
 
-      {isLoading && <Loader />}
-      {requestedFilms && <MovieList items={requestedFilms} />}
-      {totalPages && totalPages !== page && (
-        <LoadMoreButton onLoadMore={onLoadMore} />
-      )}
-      {requestedFilms?.length === 0 && (
-        <p className={css.altDescription}>
-          No films were found matching your search query.
-        </p>
-      )}
-    </section>
+      <MovieList movies={movies} />
+    </>
   );
 };
 

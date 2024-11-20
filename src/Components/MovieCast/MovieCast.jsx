@@ -1,83 +1,49 @@
+import s from "./MovieCast.module.css";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import toast from "react-hot-toast";
-import Loader from "../Loader/Loader";
-import {
-  getCastById,
-  imageUrl,
-  placeholder,
-} from "../../services/api/tmdb-api";
-
-import css from "./MovieCast.module.css";
+import { fetchMovieCredits } from "../../servises/api";
 
 const MovieCast = () => {
-  const [cast, setCast] = useState(null);
-  const [isLoading, setSsLoading] = useState(false);
-  const params = useParams();
+  const defaultImg =
+    "https://dl-media.viber.com/10/share/2/long/vibes/icon/image/0x0/95e0/5688fdffb84ff8bed4240bcf3ec5ac81ce591d9fa9558a3a968c630eaba195e0.jpg";
+
+  const { movieId } = useParams();
+  const [movieCast, setMovieCast] = useState([]);
 
   useEffect(() => {
-    setSsLoading(true);
+    if (!movieId) return;
 
-    const getCast = async () => {
+    const getData = async () => {
       try {
-        const { cast: result } = await getCastById(params.movieId);
-
-        setCast(result);
+        const data = await fetchMovieCredits(movieId);
+        setMovieCast(data);
       } catch (error) {
-        toast.error(error.response.data.status_message);
-      } finally {
-        setSsLoading(false);
+        console.log(error);
       }
     };
-
-    getCast();
-  }, [params.movieId]);
-
-  useEffect(() => {
-    scrollDown();
-  }, [cast]);
-
-  const scrollDown = () => {
-    window.scroll({
-      top: 250,
-      behavior: "smooth",
-    });
-  };
+    getData();
+  }, [movieId]);
 
   return (
-    <>
-      {isLoading && <Loader />}
-      {cast?.length !== 0 ? (
-        <ul className={css.list}>
-          {cast?.map(({ id, character, name, profile_path }) => (
-            <li key={id} className={css.listItem}>
-              <img
-                className={css.picture}
-                src={
-                  (profile_path && `${imageUrl}/w200${profile_path}`) ??
-                  placeholder
-                }
-                alt={name}
-                loading="lazy"
-                width="100"
-                height="150"
-              />
-
-              <div>
-                <h3 className={css.subtitle}>{name}</h3>
-                <p className={css.description}>
-                  Character: {character ? character : "no information"}
-                </p>
-              </div>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className={css.altDescription}>
-          We have no information about the cast.
-        </p>
-      )}
-    </>
+    <ul className={s.list}>
+      {movieCast.map((person) => (
+        <li key={person.id} className={s.item}>
+          <img
+            className={s.image}
+            src={
+              person.profile_path
+                ? `https://image.tmdb.org/t/p/w200${person.profile_path}`
+                : defaultImg
+            }
+            alt={`Photo ${person.name}`}
+          />
+          <div className={s.about}>
+            <p className={s.name}>{person.name}</p>
+            <p className={s.character}>{`character: ${person.character}`}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
   );
 };
 

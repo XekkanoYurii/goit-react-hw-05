@@ -1,141 +1,65 @@
-import { useState, useEffect, useRef } from "react";
-import { NavLink, Outlet, useLocation, useParams } from "react-router-dom";
-import clsx from "clsx";
-import toast from "react-hot-toast";
-import Loader from "../../components/Loader/Loader";
+import s from "./MovieDetailsPage.module.css";
 import {
-  getDetailsById,
-  imageUrl,
-  placeholder,
-} from "../../services/api/tmdb-api";
+  Link,
+  NavLink,
+  Outlet,
+  useLocation,
+  useParams,
+} from "react-router-dom";
+import { Suspense, useEffect, useRef, useState } from "react";
+import { fetchMovieDetails } from "../../servises/api";
+import Loader from "../../components/Loader/Loader";
+import MovieDetailsMarkup from "../../components/MovieDetailsMarkup/MovieDetailsMarkup";
+import clsx from "clsx";
 
-import css from "./MovieDetailsPage.module.css";
+const buildLinkClass = ({ isActive }) => {
+  return clsx(s.info_link, isActive && s.active);
+};
 
 const MovieDetailsPage = () => {
-  const [movie, setMovie] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
-
   const params = useParams();
   const location = useLocation();
-  const ref = useRef(location.state?.from);
+  const [movie, setMovie] = useState(null);
+  const backLink = useRef(location?.state ?? "/");
 
   useEffect(() => {
-    setIsLoading(true);
-    const getDetails = async () => {
+    const getData = async () => {
       try {
-        const response = await getDetailsById(params.movieId);
-        setMovie(response);
+        const data = await fetchMovieDetails(params.movieId);
+        setMovie(data);
       } catch (error) {
-        toast.error(error.response.data.status_message);
-      } finally {
-        setIsLoading(false);
+        console.log(error);
       }
     };
-    getDetails();
+    getData();
   }, [params.movieId]);
 
-  const movieKeys = Object.keys(movie);
-
-  const { genres, overview, poster_path, title, vote_average, release_date } =
-    movie;
-
+  if (!movie) {
+    return <Loader />;
+  }
   return (
-    <section className={css.container}>
-      <NavLink to={ref.current ?? "/movies"}>
-        <button type="button" className={css.button}>
-          Go back
-        </button>
-      </NavLink>
+    <div className={s.container}>
+      <Link to={backLink.current} className={s.backLink}>
+        🔙
+      </Link>
+      <MovieDetailsMarkup movie={movie} />
 
-      {isLoading ? (
-        <Loader />
-      ) : (
-        movieKeys?.length !== 0 && (
-          <>
-            <div className={css.infoBlock}>
-              <div>
-                <img
-                  className={css.picture}
-                  src={
-                    (poster_path && `${imageUrl}/w300${poster_path}`) ||
-                    placeholder
-                  }
-                  alt={title}
-                  loading="lazy"
-                  width="300"
-                />
-              </div>
-
-              <div className={css.details}>
-                {release_date ? (
-                  <h2>{`${title} (${release_date?.slice(0, 4)})`}</h2>
-                ) : (
-                  <h2>{title}</h2>
-                )}
-
-                <h3 className={css.subtitle}>Rating</h3>
-                {vote_average ? (
-                  <p className={css.description}>
-                    {vote_average && Math.round(vote_average * 100) / 100}
-                  </p>
-                ) : (
-                  <p className={css.description}>no information</p>
-                )}
-
-                <h3 className={css.subtitle}>Overview</h3>
-                {overview ? (
-                  <p className={css.description}>{overview}</p>
-                ) : (
-                  <p className={css.description}>no information</p>
-                )}
-
-                <h3 className={css.subtitle}>Genres</h3>
-                {genres?.length !== 0 ? (
-                  <ul className={css.list}>
-                    {genres?.map(({ id, name }) => (
-                      <li key={id} className={css.listItem}>
-                        {name}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className={css.description}>no information</p>
-                )}
-              </div>
-            </div>
-
-            <div className={css.details}>
-              <h3 className={css.subtitle}>Additional information</h3>
-              <ul className={css.list}>
-                <li className={css.listItem}>
-                  <NavLink
-                    className={({ isActive }) =>
-                      clsx(css.link, isActive && css.active)
-                    }
-                    to={"cast"}
-                    state={{ from: ref.current }}
-                  >
-                    Cast
-                  </NavLink>
-                </li>
-                <li className={css.listItem}>
-                  <NavLink
-                    className={({ isActive }) =>
-                      clsx(css.link, isActive && css.active)
-                    }
-                    to={"reviews"}
-                    state={{ from: ref.current }}
-                  >
-                    Reviews
-                  </NavLink>
-                </li>
-              </ul>
-            </div>
-            <Outlet />
-          </>
-        )
-      )}
-    </section>
+      <ul className={s.info_list}>
+        <li>
+          <NavLink to="cast" className={buildLinkClass}>
+            Cast
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="reviews" className={buildLinkClass}>
+            Reviews
+          </NavLink>
+        </li>
+      </ul>
+      <Suspense fallback={<Loader />}>
+        <Outlet />
+      </Suspense>
+    </div>
   );
 };
 

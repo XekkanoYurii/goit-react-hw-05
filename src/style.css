@@ -1,0 +1,41 @@
+#root {
+  margin: 0 auto;
+  padding: 0 15px 25px;
+  text-align: center;
+}
+
+body {
+  color: white;
+  background-color: rgb(2, 55, 66);
+  height: 100%;
+}
+
+ul {
+  list-style: none;
+  padding: 15px;
+}
+
+p {
+  margin: 0;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: white;
+  text-decoration: none;
+}
+
+img[alt] {
+  letter-spacing: 0.13em;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  margin: 0;
+}
